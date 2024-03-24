@@ -3,7 +3,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class PeerProcess {
+public class peerProcess {
     static final String COMMON_FILENAME = "src/Common.cfg";
     static final String PEER_INFO_FILENAME = "src/PeerInfo.cfg";
 
@@ -17,7 +17,7 @@ public class PeerProcess {
 
     ArrayList<String[]> peers;
 
-    public PeerProcess() {
+    public peerProcess() {
         peers = new ArrayList<>();
     }
 
@@ -96,8 +96,8 @@ public class PeerProcess {
     }
 
     public static void main(String args[]) {
-        PeerProcess peerProcess = new PeerProcess();
+        peerProcess peerProcess = new peerProcess();
         peerProcess.start();
-        System.out.println("Done");
+        System.out.println(peerProcess.unchokingInterval);
     }
 }
