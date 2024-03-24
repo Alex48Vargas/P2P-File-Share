@@ -27,12 +27,16 @@ public class PeerProcess {
     
 
 
-    public PeerProcess() throws Exception{
+    public PeerProcess() {
         //fix the port number after the config file has been parsed
         peerServer = new Server(8000);
         peerClient = new Client(8000);
-        peerServer.run();
-        peerClient.run();
+        try{
+            peerServer.run();
+            peerClient.run();
+        }finally{
+            System.out.println("n");
+        }
     }
 
 
@@ -65,12 +69,16 @@ public class PeerProcess {
 
     public static void main(String args[]) {
 
-        PeerProcess peerProcess = new PeerProcess();
-
-        peerProcess.start();
-
-        peerProcess.peerId = args[0];
-        System.out.println("Peer_" + peerProcess.peerId + " is running");
+        try{
+            PeerProcess peerProcess = new PeerProcess();
+            peerProcess.start();
+    
+            peerProcess.peerId = args[0];
+            System.out.println("Peer_" + peerProcess.peerId + " is running");
+        } finally{
+            System.out.println("EXCEPTION ERROR IN CREATING CLIENT/SERVER");
+        }
+        
         
         
      
