@@ -6,11 +6,15 @@ import java.util.*;
 
 public class Server {
 
-	private static final int sPort = 8000; // The server will be listening on this port number
+	int port;
 
-	public static void main(String[] args) throws Exception {
+	public Server(int p){
+		port = p;
+	}
+ 	// The server will be listening on this port number
+	void run() throws Exception{
 		System.out.println("The server is running.");
-		ServerSocket listener = new ServerSocket(sPort);
+		ServerSocket listener = new ServerSocket(port);
 		int clientNum = 1;
 		try {
 			while (true) {
@@ -21,7 +25,11 @@ public class Server {
 		} finally {
 			listener.close();
 		}
+	}
 
+	public void main(String[] args) throws Exception {
+		Server server = new Server(8000);
+		server.run();
 	}
 
 	/**

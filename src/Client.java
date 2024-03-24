@@ -10,15 +10,17 @@ public class Client {
 	ObjectInputStream in; // stream read from the socket
 	String message; // message send to the server
 	String MESSAGE; // capitalized message read from the server
+	int socket;
 
-	public void Client() {
+	public Client(int s) {
+		socket = s;
 	}
 
 	void run() {
 		try {
 			// create a socket to connect to the server
-			requestSocket = new Socket("localhost", 8000);
-			System.out.println("Connected to localhost in port 8000");
+			requestSocket = new Socket("localhost", socket);
+			System.out.println("Connected to localhost in port FIX");
 			// initialize inputStream and outputStream
 			out = new ObjectOutputStream(requestSocket.getOutputStream());
 			out.flush();
@@ -70,7 +72,7 @@ public class Client {
 
 	// main method
 	public static void main(String args[]) {
-		Client client = new Client();
+		Client client = new Client(8000);
 		client.run();
 	}
 
