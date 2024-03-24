@@ -14,7 +14,7 @@ public class peerProcess {
         peerProcess.start();
         ServerSocket listener = new ServerSocket(sPort);
         int clientNum = 1;
-        System.out.println(peerProcess.peers);
+        // System.out.println(peerProcess.peers.get(0).ID);
         try {
             while (true) {
                 new Handler(listener.accept(), clientNum).start();
@@ -196,4 +196,3 @@ public class peerProcess {
         }
     }
 }
-
