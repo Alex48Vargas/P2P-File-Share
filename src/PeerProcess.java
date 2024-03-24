@@ -22,6 +22,23 @@ public class peerProcess {
     int numPieces;
 
     ArrayList<String[]> peers;
+    public static void main(String args[]) throws Exception {
+        System.out.println("The peer is running.");
+        peerProcess peerProcess = new peerProcess();
+        peerProcess.start();
+        ServerSocket listener = new ServerSocket(sPort);
+        int clientNum = 1;
+        try {
+            while (true) {
+                new Handler(listener.accept(), clientNum).start();
+                System.out.println("Client " + clientNum + " is connected!");
+                clientNum++;
+            }
+        } finally {
+            listener.close();
+        }
+        // System.out.println(peerProcess.unchokingInterval);
+    }
 
     public peerProcess() {
         peers = new ArrayList<>();
@@ -71,6 +88,7 @@ public class peerProcess {
                     }
                 }
             }
+            System.out.println("Successful");
         } catch (IOException e) {
             // Handle file read error
             e.printStackTrace();
@@ -89,6 +107,7 @@ public class peerProcess {
                     peers.add(parts);
                 }
             }
+            System.out.println("Successful");
         } catch (IOException e) {
             // Handle file read error
             e.printStackTrace();
@@ -99,24 +118,6 @@ public class peerProcess {
         readCommonConfig();
         numPieces = Math.ceilDiv(fileSize, pieceSize);
         readPeerInfoConfig();
-    }
-
-    public static void main(String args[]) throws Exception {
-        System.out.println("The peer is running.");
-        peerProcess peerProcess = new peerProcess();
-        peerProcess.start();
-        ServerSocket listener = new ServerSocket(sPort);
-        int clientNum = 1;
-        try {
-            while (true) {
-                new Handler(listener.accept(), clientNum).start();
-                System.out.println("Client " + clientNum + " is connected!");
-                clientNum++;
-            }
-        } finally {
-            listener.close();
-        }
-        // System.out.println(peerProcess.unchokingInterval);
     }
 
     /**
