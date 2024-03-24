@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.logging.Handler;
 
 public class peerProcess {
     private static final int sPort = 8000; // The server will be listening on this port number
@@ -102,11 +101,29 @@ public class peerProcess {
         readPeerInfoConfig();
     }
 
+    public static void main(String args[]) throws Exception {
+        System.out.println("The peer is running.");
+        peerProcess peerProcess = new peerProcess();
+        peerProcess.start();
+        ServerSocket listener = new ServerSocket(sPort);
+        int clientNum = 1;
+        try {
+            while (true) {
+                new Handler(listener.accept(), clientNum).start();
+                System.out.println("Client " + clientNum + " is connected!");
+                clientNum++;
+            }
+        } finally {
+            listener.close();
+        }
+        // System.out.println(peerProcess.unchokingInterval);
+    }
+
     /**
      * A handler thread class. Handlers are spawned from the listening
      * loop and are responsible for dealing with a single client's requests.
      */
-    private static class Handler extends Thread {
+    static class Handler extends Thread {
         private String message; // message received from the client
         private String MESSAGE; // uppercase message send to the client
         private Socket connection;
@@ -162,24 +179,6 @@ public class peerProcess {
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
-        }
-
-        public static void main(String args[]) throws Exception {
-            System.out.println("The peer is running.");
-            peerProcess peerProcess = new peerProcess();
-            peerProcess.start();
-            ServerSocket listener = new ServerSocket(sPort);
-            int clientNum = 1;
-            try {
-                while (true) {
-                    new Handler(listener.accept(), clientNum).start();
-                    System.out.println("Client " + clientNum + " is connected!");
-                    clientNum++;
-                }
-            } finally {
-                listener.close();
-            }
-            // System.out.println(peerProcess.unchokingInterval);
         }
     }
 }
