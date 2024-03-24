@@ -115,6 +115,7 @@ public class peerProcess {
     private void start() {
         System.out.println("Starting");
         readCommonConfig();
+        numPieces = Math.ceilDiv(fileSize, pieceSize);
         readPeerInfoConfig();
         connectToPeers();
     }
