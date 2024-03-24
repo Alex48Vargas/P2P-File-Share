@@ -8,6 +8,24 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class peerProcess {
+    public static void main(String args[]) throws Exception {
+        System.out.println("The peer is running.");
+        peerProcess peerProcess = new peerProcess();
+        peerProcess.start();
+        ServerSocket listener = new ServerSocket(sPort);
+        int clientNum = 1;
+        System.out.println(peerProcess.peers);
+        try {
+            while (true) {
+                new Handler(listener.accept(), clientNum).start();
+                System.out.println("Client " + clientNum + " is connected!");
+                clientNum++;
+            }
+        } finally {
+            listener.close();
+        }
+    }
+
     private static final int sPort = 8000; // The server will be listening on this port number
 
     static final String COMMON_FILENAME = "src/Common.cfg";
@@ -21,28 +39,23 @@ public class peerProcess {
     int pieceSize;
     int numPieces;
 
-    ArrayList<String[]> peers;
+    ArrayList<Peers> peers;
 
-    public static void main(String args[]) throws Exception {
-        System.out.println("The peer is running.");
-        peerProcess peerProcess = new peerProcess();
-        peerProcess.start();
-        ServerSocket listener = new ServerSocket(sPort);
-        int clientNum = 1;
-        try {
-            while (true) {
-                new Handler(listener.accept(), clientNum).start();
-                System.out.println("Client " + clientNum + " is connected!");
-                clientNum++;
-            }
-        } finally {
-            listener.close();
-        }
-        // System.out.println(peerProcess.unchokingInterval);
+    public class Peers {
+        int ID;
+        String hostName;
+        int portNum;
+        boolean hasFile;
     }
 
     public peerProcess() {
         peers = new ArrayList<>();
+    }
+
+    private void start() {
+        readCommonConfig();
+        numPieces = Math.ceilDiv(fileSize, pieceSize);
+        readPeerInfoConfig();
     }
 
     private void readCommonConfig() {
@@ -105,7 +118,12 @@ public class peerProcess {
                 String[] parts = line.split(" ");
 
                 if (parts.length == 4) {
-                    peers.add(parts);
+                    Peers peer = new Peers();
+                    peer.ID = Integer.parseInt(parts[0]);
+                    peer.hostName = parts[1];
+                    peer.portNum = Integer.parseInt(parts[2]);
+                    peer.hasFile = Boolean.parseBoolean(parts[3]);
+                    peers.add(peer);
                 }
             }
             System.out.println("Successful");
@@ -113,12 +131,6 @@ public class peerProcess {
             // Handle file read error
             e.printStackTrace();
         }
-    }
-
-    private void start() {
-        readCommonConfig();
-        numPieces = Math.ceilDiv(fileSize, pieceSize);
-        readPeerInfoConfig();
     }
 
     /**
@@ -184,3 +196,4 @@ public class peerProcess {
         }
     }
 }
+
