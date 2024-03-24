@@ -1,8 +1,8 @@
 import java.net.*;
 import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
+// import java.nio.*;
+// import java.nio.channels.*;
+// import java.util.*;
 
 public class Client {
 	Socket requestSocket; // socket connect to the server
@@ -11,7 +11,7 @@ public class Client {
 	String message; // message send to the server
 	String MESSAGE; // capitalized message read from the server
 
-	public void Client() {
+	public Client() {
 	}
 
 	void run() {
