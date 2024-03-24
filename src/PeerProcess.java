@@ -22,7 +22,7 @@ public class peerProcess {
     int numPieces;
 
     ArrayList<String[]> peers;
-    
+
     public static void main(String args[]) throws Exception {
         System.out.println("The peer is running.");
         peerProcess peerProcess = new peerProcess();
