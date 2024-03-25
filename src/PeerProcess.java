@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class peerProcess {
+    public static void main(String args[]) throws Exception {
+        System.out.println("Peer " + args[0] + " is running.");
+        peerProcess peerProcess = new peerProcess(Integer.parseInt(args[0]));
+    }
+    
     // File locations
     static final String COMMON_FILENAME = "Common.cfg";
     static final String PEER_INFO_FILENAME = "PeerInfo.cfg";
@@ -132,10 +137,4 @@ public class peerProcess {
             t.start();
         }
     }
-
-    public static void main(String args[]) throws Exception {
-        System.out.println("Peer " + args[0] + " is running.");
-        peerProcess peerProcess = new peerProcess(Integer.parseInt(args[0]));
-    }
-
 }
