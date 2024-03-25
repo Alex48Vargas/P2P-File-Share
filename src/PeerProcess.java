@@ -1,36 +1,20 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class peerProcess {
     public static void main(String args[]) throws Exception {
-        System.out.println("The peer is running.");
-        peerProcess peerProcess = new peerProcess();
-        peerProcess.start();
-        ServerSocket listener = new ServerSocket(sPort);
-        int clientNum = 1;
-        // System.out.println(peerProcess.peers.get(0).ID);
-        try {
-            while (true) {
-                new Handler(listener.accept(), clientNum).start();
-                System.out.println("Client " + clientNum + " is connected!");
-                clientNum++;
-            }
-        } finally {
-            listener.close();
-        }
+        System.out.println("Peer " + args[0] + " is running.");
+        peerProcess peerProcess = new peerProcess(Integer.parseInt(args[0]));
     }
+    
+    // File locations
+    static final String COMMON_FILENAME = "Common.cfg";
+    static final String PEER_INFO_FILENAME = "PeerInfo.cfg";
 
-    private static final int sPort = 8000; // The server will be listening on this port number
-
-    static final String COMMON_FILENAME = "src/Common.cfg";
-    static final String PEER_INFO_FILENAME = "src/PeerInfo.cfg";
-
+    // Config variables
     int numPreferredNeighbors;
     int unchokingInterval;
     int optimisticUnchokingInterval;
@@ -38,6 +22,11 @@ public class peerProcess {
     int fileSize;
     int pieceSize;
     int numPieces;
+
+    // Member Variables
+    int peerId;
+    Server server;
+    HashMap<Integer, Client> clients;
 
     ArrayList<Peers> peers;
 
@@ -48,14 +37,21 @@ public class peerProcess {
         boolean hasFile;
     }
 
-    public peerProcess() {
+    public peerProcess(int peerId) throws Exception {
+        this.peerId = peerId;
         peers = new ArrayList<>();
+        server = new Server(peerId, 7000 + peerId);
+        Thread t = new Thread(server);
+        t.start();
+        start();
     }
 
     private void start() {
+        System.out.println("Starting");
         readCommonConfig();
         numPieces = Math.ceilDiv(fileSize, pieceSize);
         readPeerInfoConfig();
+        connectToPeers();
     }
 
     private void readCommonConfig() {
@@ -102,7 +98,7 @@ public class peerProcess {
                     }
                 }
             }
-            System.out.println("Successful");
+            numPieces = Math.ceilDiv(fileSize, pieceSize);
         } catch (IOException e) {
             // Handle file read error
             e.printStackTrace();
@@ -110,6 +106,7 @@ public class peerProcess {
     }
 
     private void readPeerInfoConfig() {
+
         String filePath = System.getProperty("user.dir") + "/" + PEER_INFO_FILENAME;
         System.out.println("Attempting to read file: " + filePath); // Debug information
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -126,73 +123,18 @@ public class peerProcess {
                     peers.add(peer);
                 }
             }
-            System.out.println("Successful");
         } catch (IOException e) {
             // Handle file read error
             e.printStackTrace();
         }
     }
 
-    /**
-     * A handler thread class. Handlers are spawned from the listening
-     * loop and are responsible for dealing with a single client's requests.
-     */
-    static class Handler extends Thread {
-        private String message; // message received from the client
-        private String MESSAGE; // uppercase message send to the client
-        private Socket connection;
-        private ObjectInputStream in; // stream read from the socket
-        private ObjectOutputStream out; // stream write to the socket
-        private int no; // The index number of the client
-
-        public Handler(Socket connection, int no) {
-            this.connection = connection;
-            this.no = no;
-        }
-
-        public void run() {
-            try {
-                // initialize Input and Output streams
-                out = new ObjectOutputStream(connection.getOutputStream());
-                out.flush();
-                in = new ObjectInputStream(connection.getInputStream());
-                try {
-                    while (true) {
-                        // receive the message sent from the client
-                        message = (String) in.readObject();
-                        // show the message to the user
-                        System.out.println("Receive message: " + message + " from client " + no);
-                        // Capitalize all letters in the message
-                        MESSAGE = message.toUpperCase();
-                        // send MESSAGE back to the client
-                        sendMessage(MESSAGE);
-                    }
-                } catch (ClassNotFoundException classnot) {
-                    System.err.println("Data received in unknown format");
-                }
-            } catch (IOException ioException) {
-                System.out.println("Disconnect with Client " + no);
-            } finally {
-                // Close connections
-                try {
-                    in.close();
-                    out.close();
-                    connection.close();
-                } catch (IOException ioException) {
-                    System.out.println("Disconnect with Client " + no);
-                }
-            }
-        }
-
-        // send a message to the output stream
-        public void sendMessage(String msg) {
-            try {
-                out.writeObject(msg);
-                out.flush();
-                System.out.println("Send message: " + msg + " to Client " + no);
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+    private void connectToPeers() {
+        for (int i = 1001; i<peerId; i++) {
+            System.out.println("Connecting to peer " + i);
+            Client client = new Client("localhost", 7000 + i);
+            Thread t = new Thread(client);
+            t.start();
         }
     }
 }
