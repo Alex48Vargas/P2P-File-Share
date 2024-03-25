@@ -22,7 +22,15 @@ public class peerProcess {
     int peerId;
     Server server;
     HashMap<Integer, Client> clients;
-    ArrayList<String[]> peers;
+
+    ArrayList<Peers> peers;
+
+    public class Peers {
+        int ID;
+        String hostName;
+        int portNum;
+        boolean hasFile;
+    }
 
     public peerProcess(int peerId) throws Exception {
         this.peerId = peerId;
@@ -31,6 +39,14 @@ public class peerProcess {
         Thread t = new Thread(server);
         t.start();
         start();
+    }
+
+    private void start() {
+        System.out.println("Starting");
+        readCommonConfig();
+        numPieces = Math.ceilDiv(fileSize, pieceSize);
+        readPeerInfoConfig();
+        connectToPeers();
     }
 
     private void readCommonConfig() {
@@ -85,7 +101,7 @@ public class peerProcess {
     }
 
     private void readPeerInfoConfig() {
-        
+
         String filePath = System.getProperty("user.dir") + "/" + PEER_INFO_FILENAME;
         System.out.println("Attempting to read file: " + filePath); // Debug information
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -94,7 +110,12 @@ public class peerProcess {
                 String[] parts = line.split(" ");
 
                 if (parts.length == 4) {
-                    peers.add(parts);
+                    Peers peer = new Peers();
+                    peer.ID = Integer.parseInt(parts[0]);
+                    peer.hostName = parts[1];
+                    peer.portNum = Integer.parseInt(parts[2]);
+                    peer.hasFile = Boolean.parseBoolean(parts[3]);
+                    peers.add(peer);
                 }
             }
         } catch (IOException e) {
@@ -110,14 +131,6 @@ public class peerProcess {
             Thread t = new Thread(client);
             t.start();
         }
-    }
-
-    private void start() {
-        System.out.println("Starting");
-        readCommonConfig();
-        numPieces = Math.ceilDiv(fileSize, pieceSize);
-        readPeerInfoConfig();
-        connectToPeers();
     }
 
     public static void main(String args[]) throws Exception {
