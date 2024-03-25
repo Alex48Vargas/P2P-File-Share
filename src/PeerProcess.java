@@ -9,7 +9,7 @@ public class peerProcess {
         System.out.println("Peer " + args[0] + " is running.");
         peerProcess peerProcess = new peerProcess(Integer.parseInt(args[0]));
     }
-    
+
     // File locations
     static final String COMMON_FILENAME = "Common.cfg";
     static final String PEER_INFO_FILENAME = "PeerInfo.cfg";
