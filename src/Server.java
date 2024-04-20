@@ -1,37 +1,27 @@
 import java.net.*;
 import java.io.*;
+// import java.nio.*;
+// import java.nio.channels.*;
+// import java.util.*;
 
-public class Server implements Runnable{
+public class Server {
 
-	int peerId;
-	int sPort;
+	private static final int sPort = 8000; // The server will be listening on this port number
 
-	public Server(int peerId, int sPort) throws Exception {
-		this.peerId = peerId;
-		this.sPort = sPort;
-	}
-
-	public void run() {
-		try {
-			start();
-		} catch (Exception e){
-			System.out.println(e);
-		}
-	}
-
-	public void start() throws IOException{
-		System.out.println("Peer " + peerId + "'s server listening on port " + sPort);
+	public static void main(String[] args) throws Exception {
+		System.out.println("The server is running.");
 		ServerSocket listener = new ServerSocket(sPort);
-		int peerNum = 1001;
+		int clientNum = 1;
 		try {
 			while (true) {
-				new Handler(listener.accept(), peerNum).start();
-				System.out.println("Client is connected!");
-				peerNum++;
+				new Handler(listener.accept(), clientNum).start();
+				System.out.println("Client " + clientNum + " is connected!");
+				clientNum++;
 			}
 		} finally {
 			listener.close();
 		}
+
 	}
 
 	/**

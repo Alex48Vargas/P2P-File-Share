@@ -1,25 +1,24 @@
 import java.net.*;
 import java.io.*;
+// import java.nio.*;
+// import java.nio.channels.*;
+// import java.util.*;
 
-public class Client implements Runnable{
+public class Client {
 	Socket requestSocket; // socket connect to the server
 	ObjectOutputStream out; // stream write to the socket
 	ObjectInputStream in; // stream read from the socket
 	String message; // message send to the server
 	String MESSAGE; // capitalized message read from the server
-	String host;
-	int portNum;
 
-	public Client(String host, int portNum) {
-		this.host = host;
-		this.portNum = portNum;
+	public Client() {
 	}
 
-	public void run() {
+	void run() {
 		try {
 			// create a socket to connect to the server
-			requestSocket = new Socket(host, portNum);
-			System.out.println("Connected to Peer " + (portNum-7000) + " at " + host + ":" + portNum);
+			requestSocket = new Socket("localhost", 8000);
+			System.out.println("Connected to localhost in port 8000");
 			// initialize inputStream and outputStream
 			out = new ObjectOutputStream(requestSocket.getOutputStream());
 			out.flush();
@@ -67,6 +66,12 @@ public class Client implements Runnable{
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+	}
+
+	// main method
+	public static void main(String args[]) {
+		Client client = new Client();
+		client.run();
 	}
 
 }
